@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GTA V — Los Santos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #0a0a0a;
+      }
+      #map {
+        width: 100vw;
+        height: 100vh;
+      }
+      .maplibregl-ctrl-bottom-left,
+      .maplibregl-ctrl-bottom-right {
+        display: none;
+      }
+      #coords {
+        position: fixed;
+        bottom: 12px;
+        left: 12px;
+        background: rgba(0, 0, 0, 0.65);
+        color: #e0e0e0;
+        font: 12px/1.4 monospace;
+        padding: 6px 10px;
+        border-radius: 4px;
+        pointer-events: none;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div>
+      <span id="zoom-val">—</span>
+    </div>
+    <div id="coords">X: — &nbsp; Y: —</div>
+
+    <script>
+      // Tile extent: tiles_x=189, tiles_y=256 at zoom 8
+      const W = -180,
+        E = 85.78125,
+        N = 85.051129,
+        S = -85.051129;
+      // GTA V world coordinate corners
+      const GTA_X1 = -3900,
+        GTA_X2 = 6000; // west → east
+      const GTA_Y1 = 8000,
+        GTA_Y2 = -4000; // north → south
+
+      const map = new maplibregl.Map({
+        container: "map",
+        style: {
+          version: 8,
+          sources: {
+            gtav: {
+              type: "raster",
+              tiles: ["tiles/{z}/{x}/{y}.png"],
+              tileSize: 256,
+            },
+          },
+          layers: [
+            {
+              id: "background",
+              type: "background",
+              paint: { "background-color": "#273a5f" },
+            },
+            {
+              id: "gtav-layer",
+              type: "raster",
+              source: "gtav",
+              paint: { "raster-opacity": 1 },
+            },
+          ],
+        },
+        center: [0, 0],
+        zoom: 0,
+        maxZoom: 5,
+        renderWorldCopies: false,
+      });
+
+      map.doubleClickZoom.disable();
+
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }));
+      map.dragRotate.disable();
+      map.keyboard.disable();
+      map.touchZoomRotate.disableRotation();
+      const coordsEl = document.getElementById("coords");
+      map.on("mousemove", (e) => {
+        const { lng, lat } = e.lngLat;
+        const gtaX = GTA_X1 + ((lng - W) / (E - W)) * (GTA_X2 - GTA_X1);
+        const gtaY = GTA_Y1 + ((lat - N) / (S - N)) * (GTA_Y2 - GTA_Y1);
+        coordsEl.textContent = `X: ${gtaX.toFixed(1)}   Y: ${gtaY.toFixed(1)}`;
+      });
+      map.on("mouseleave", () => {
+        coordsEl.textContent = "X: —   Y: —";
+      });
+    </script>
+  </body>
+</html>
