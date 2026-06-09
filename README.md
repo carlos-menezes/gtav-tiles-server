@@ -1,8 +1,6 @@
 # GTA V Map Tiles
 
-<video width="320" height="240" controls>
-  <source src="./demo.mp4" type="video/mp4">
-</video>
+https://github.com/user-attachments/assets/8ef03deb-3607-4976-8477-3ae810d5363d
 
 An interactive slippy map of GTA V's Los Santos, built with [MapLibre GL](https://maplibre.org/).
 
