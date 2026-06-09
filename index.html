@@ -2,7 +2,6 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>GTA V — Los Santos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"
@@ -68,6 +67,8 @@
               type: "raster",
               tiles: ["tiles/{z}/{x}/{y}.png"],
               tileSize: 256,
+              minzoom: 0,
+              maxzoom: 6,
             },
           },
           layers: [
@@ -86,16 +87,28 @@
         },
         center: [0, 0],
         zoom: 0,
-        maxZoom: 5,
+        maxZoom: 6,
+
         renderWorldCopies: false,
       });
 
       map.doubleClickZoom.disable();
 
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }));
+
+      // disable map rotation using right click + drag
       map.dragRotate.disable();
+
+      // disable map rotation using keyboard
       map.keyboard.disable();
+
+      // disable map rotation using touch rotation gesture
       map.touchZoomRotate.disableRotation();
+
+      map.on("click", (e) => {
+        console.log("coords:", e.lngLat);
+      });
+
       const coordsEl = document.getElementById("coords");
       map.on("mousemove", (e) => {
         const { lng, lat } = e.lngLat;
